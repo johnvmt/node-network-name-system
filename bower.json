@@ -1,0 +1,16 @@
+{
+  "name": "node-network-ns-rpc",
+  "version": "0.0.1",
+  "description": "RPC over Node Network with NameService enabled",
+  "authors": [
+    "John Murphy-Teixidor <johnvmt@gmail.com>"
+  ],
+  "license": "MIT",
+  "main": "./src/DnsRpc.js",
+  "keywords": [],
+  "ignore": [
+    "**/.*",
+    "bower_components"
+  ],
+  "dependencies": {}
+}

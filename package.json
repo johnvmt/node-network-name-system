@@ -1,0 +1,29 @@
+{
+  "name": "node-network-ns-rpc",
+  "readme": "RPC over Node Network with NameService enabled",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/johnvmt/node-network-name-system.git"
+  },
+  "author": {
+    "name": "John Murphy-Teixidor",
+    "email": "johnvmt@gmail.com"
+  },
+  "dependencies": {
+    "wolfy87-eventemitter": "5.1.x",
+    "agnostic-router": "0.1.x",
+    "mongolocal": "1.2.x",
+    "node-network-rpc": "https://github.com/johnvmt/node-network-rpc.git",
+    "oms": "https://github.com/johnvmt/oms.git"
+  },
+  "devDependencies": {
+    "browserify": "11.2.x",
+    "minifyify": "7.3.x"
+  },
+  "scripts": {
+    "prepublish": "node ./scripts/browserify.js"
+  },
+  "main": "./src/DnsRpc.js",
+  "license": "MIT"
+}
