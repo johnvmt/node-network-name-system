@@ -13,6 +13,7 @@
   "dependencies": {
     "wolfy87-eventemitter": "5.1.x",
     "agnostic-router": "0.1.x",
+    "agnostic-router-api-builder": "https://github.com/johnvmt/agnostic-router-api-builder.git",
     "mongolocal": "1.2.x",
     "node-network-rpc": "https://github.com/johnvmt/node-network-rpc.git",
     "oms": "https://github.com/johnvmt/oms.git"

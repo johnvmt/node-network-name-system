@@ -9,6 +9,7 @@ function DnsClient(dnsDb, rpc, dnsServerAddress, config) {
 		throw new Error('dnsClient_apiPath_undefined');
 }
 
+
 DnsClient.prototype.joinGroup = function(group, callback) {
 	var self = this;
 	self._rpc.request(self._dnsServerAddress, self._config.apiPath + '/join', {address: self._rpc.address, group: group}, {multipleResponses: false}, callback);

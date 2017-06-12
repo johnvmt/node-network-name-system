@@ -153,6 +153,33 @@ DnsDb.prototype.removeFromAllGroups = function(address, callback) {
 	}
 };
 
+DnsDb.prototype.subscribeToGroup = function() {
+
+	var parsedArgs = Utils.parseArgs(
+		arguments,
+		[
+			{name: 'groupQuery', level: 1, types: ['object', 'string'], default: {}},
+			{name: 'oplogQuery', level: 1, type: 'object', default: {}},
+			{name: 'callback', level: 0,  type: 'function'}
+		]
+	);
+
+	this.groupsOplogSubscriptions.findSubscribe(parsedArgs.groupQuery, parsedArgs.oplogQuery, function(error, operationDoc) {
+		if(error)
+			parsedArgs.callback(error, null);
+		else
+			parsedArgs.callback(null, operationDoc);
+	});
+
+};
+
+DnsDb.prototype.unsubscribe = function(subscriptionId, callback) {
+	if(typeof subscriptionId != 'string')
+		callback('subscription_undefined', null);
+	else
+		this.groupsOplogSubscriptions.unsubscribe(subscriptionId, callback);
+};
+
 module.exports = function(options) {
 	return new DnsDb(options);
 };

@@ -1,4 +1,4 @@
-// Utils module 1.0.10
+// Utils module 1.0.12
 var Utils = {};
 
 /**
@@ -78,7 +78,7 @@ Utils.objectContainsObject = function(parentObject, childObject, searchDeep) {
 		}
 	}
 	return true;
-}
+};
 
 Utils.objectFilter = function(object, filter) {
 	// filter object properties (children) using filter function
@@ -231,7 +231,14 @@ Utils.parseArgs = function(argsPassed, argsConfig) {
 	}
 
 	function validArg(argConfig, arg) {
-		return typeof argConfig.validate != 'function' || argConfig.validate(arg)
+		if(typeof argConfig.validate == 'function')
+			return argConfig.validate(arg);
+		else if(typeof argConfig.type == 'string')
+			return typeof arg == argConfig.type;
+		else if(Array.isArray(argConfig.types))
+			return argConfig.types.indexOf(typeof arg) >= 0;
+		else
+			return true;
 	}
 
 	function requiredLeftEnough(argsConfig, minIndex) {

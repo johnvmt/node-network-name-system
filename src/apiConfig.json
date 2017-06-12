@@ -1,0 +1,56 @@
+{
+  "joinGroup": {
+	"pattern": "/join",
+	"arguments": [
+	  {"name": "address", "source": "query"},
+	  {"name": "group", "source": "query"}
+	],
+	"requestOptions": {
+	  "multipleResponses": false
+	}
+  },
+  "leaveGroup": {
+	"pattern": "/leave",
+	"arguments": [
+	  {"name": "address", "source": "query"},
+	  {"name": "group", "source": "query"}
+	],
+	"requestOptions": {
+	  "multipleResponses": false
+	}
+  },
+  "leaveAllGroups": {
+	"pattern": "leaveall",
+	"arguments": [
+	  {"name": "address", "source": "query"}
+	],
+	"requestOptions": {
+	  "multipleResponses": false
+	}
+  },
+  "groupAddresses": {
+	"pattern": "/group/find",
+	"arguments": [
+	  {"name": "group", "source": "query"}
+	],
+	"requestOptions": {
+	  "multipleResponses": false
+	}
+  },
+  "subscribeToGroup": {
+	"pattern": "group/subscribe",
+	"arguments": [
+	  {"name": "groupQuery", "level": 1,  "types": ["object", "string"], "default": {}},
+	  {"name": "oplogQuery", "level": 1, "type": "object", "default": {}}
+	]
+  },
+  "unsubscribe": {
+	"pattern": "/group/unsubscribe",
+	"arguments": [
+	  {"name": "subscriptionId", "source": "query"}
+	],
+	"requestOptions": {
+	  "multipleResponses": false
+	}
+  }
+}

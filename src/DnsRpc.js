@@ -1,3 +1,4 @@
+var EventEmitter = require('wolfy87-eventemitter');
 var NodeNetworkRpc = require('node-network-rpc');
 var DnsClient = require('./DnsClient');
 var DnsDb = require('./DnsDb');
@@ -19,6 +20,8 @@ function DnsRpc(config) {
 	};
 
 	self._config = Utils.objectMerge(defaultConfig, config);
+	self._config.dnsDb = Utils.objectMerge(defaultConfig.dnsDb, self._config.dnsDb);
+	self._config.dnsClient = Utils.objectMerge(defaultConfig.dnsClient, self._config.dnsClient);
 
 	if(typeof self._config.dnsServer != 'string')
 		throw new Error('dnsServer_undefined');
@@ -51,11 +54,11 @@ DnsRpc.prototype.request = function() {
 	var parsedArgs = Utils.parseArgs(
 		arguments,
 		[
-			{name: 'destGroup', level: 0,  validate: function(arg, allArgs) { return typeof arg == 'string'; }},
-			{name: 'path', level: 0,  validate: function(arg, allArgs) { return typeof arg == 'string' && arg[0] == '/'; }},
-			{name: 'query', level: 1,  validate: function(arg, allArgs) { return typeof arg == 'object'; }, default: {}},
-			{name: 'options', level: 2,  validate: function(arg, allArgs) { return typeof arg == 'object'; }, default: {}},
-			{name: 'callback', level: 1,  validate: function(arg, allArgs) { return typeof(arg) === 'function'; }}
+			{name: 'destGroup', level: 0, type: 'string'},
+			{name: 'path', level: 0, validate: function(arg, allArgs) { return typeof arg == 'string' && arg[0] == '/'; }},
+			{name: 'query', level: 1, type: 'object', default: {}},
+			{name: 'options', level: 2,  type: 'object', default: {}},
+			{name: 'callback', level: 1,  type: 'function'}
 		]
 	);
 
@@ -105,6 +108,10 @@ DnsRpc.prototype.request = function() {
 		if(typeof parsedArgs.callback == 'function')
 			parsedArgs.callback(error, result);
 	}
+};
+
+DnsRpc.prototype.addConnection = function() {
+	this.rpc.addConnection.apply(this.rpc, Array.prototype.slice.call(arguments));
 };
 
 module.exports = function(config) {
