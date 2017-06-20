@@ -51,10 +51,11 @@ DnsRpc.prototype.__proto__ = EventEmitter.prototype;
 DnsRpc.prototype.request = function() {
 	var self = this;
 
+	// TODO make destGroup optional
 	var parsedArgs = Utils.parseArgs(
 		arguments,
 		[
-			{name: 'destGroup', level: 0, type: 'string'},
+			{name: 'destGroup', level: 1, type: 'string', default: self.config.defaultGroup},
 			{name: 'path', level: 0, validate: function(arg, allArgs) { return typeof arg == 'string' && arg[0] == '/'; }},
 			{name: 'query', level: 1, type: 'object', default: {}},
 			{name: 'options', level: 2,  type: 'object', default: {}},
@@ -69,40 +70,46 @@ DnsRpc.prototype.request = function() {
 
 	parsedArgs.options = Utils.objectMerge(defaultOptions, parsedArgs.options);
 
-	self._dnsDb.groups.findOne(parsedArgs.destGroup, function(error, groupDoc) {
-		if(error)
-			callbackSafe(error, null);
-		else if(groupDoc != null) { // Group is saved locally
-			if(Array.isArray(groupDoc.addresses) && groupDoc.addresses.length > 0) // group has members
-				self._rpc.request(groupDoc.addresses, parsedArgs.path, parsedArgs.query, parsedArgs.options, parsedArgs.callback);
-		}
-		else if(parsedArgs.options.groupLookup) { // Try retreiving group remotely
-			if(parsedArgs.options.groupSubscribe) {
-				// TODO check if subscription in progress
-				self.groupSubscribe(parsedArgs.destGroup, function(error, subscriptionId) {
-					self._dnsDb.groups.findOne(parsedArgs.destGroup, function(error, groupDoc) {
+	if(typeof parsedArgs.destGroup != 'string')
+		callbackSafe('destGroup_undefined', null);
+	else {
+		self._dnsDb.groups.findOne(parsedArgs.destGroup, function(error, groupDoc) {
+			if(error)
+				callbackSafe(error, null);
+			else if(groupDoc != null) { // Group is saved locally
+				if(Array.isArray(groupDoc.addresses) && groupDoc.addresses.length > 0) // group has members
+					self._rpc.request(groupDoc.addresses, parsedArgs.path, parsedArgs.query, parsedArgs.options, parsedArgs.callback);
+			}
+			else if(parsedArgs.options.groupLookup) { // Try retreiving group remotely
+				if(parsedArgs.options.groupSubscribe) {
+					// TODO check if subscription in progress
+					self.groupSubscribe(parsedArgs.destGroup, function(error, subscriptionId) {
+						self._dnsDb.groups.findOne(parsedArgs.destGroup, function(error, groupDoc) {
+							if(error)
+								callbackSafe(error, null);
+							else if(groupDoc == null || (Array.isArray(groupDoc.addresses) && groupDoc.addresses.length == 0))
+								callbackSafe('empty_group', null)
+							else if(Array.isArray(groupDoc.addresses) && groupDoc.addresses.length > 0) { // group has members
+								self._rpc.request(groupDoc.addresses, parsedArgs.path, parsedArgs.query, parsedArgs.options, parsedArgs.callback);
+							}
+						});
+					});
+				}
+				else {
+					self.groupAddresses(parsedArgs.destGroup, function(error, addresses) {
 						if(error)
 							callbackSafe(error, null);
-						else if(groupDoc == null || (Array.isArray(groupDoc.addresses) && groupDoc.addresses.length == 0))
-							callbackSafe('empty_group', null)
-						else if(Array.isArray(groupDoc.addresses) && groupDoc.addresses.length > 0) { // group has members
-							self._rpc.request(groupDoc.addresses, parsedArgs.path, parsedArgs.query, parsedArgs.options, parsedArgs.callback);
-						}
+						else
+							self._rpc.request(addresses, parsedArgs.path, parsedArgs.query, parsedArgs.options, parsedArgs.callback);
 					});
-				});
+				}
 			}
-			else {
-				self.groupAddresses(parsedArgs.destGroup, function(error, addresses) {
-					if(error)
-						callbackSafe(error, null);
-					else
-						self._rpc.request(addresses, parsedArgs.path, parsedArgs.query, parsedArgs.options, parsedArgs.callback);
-				});
-			}
-		}
-		else
-			callbackSafe('group_undefined', null);
-	});
+			else
+				callbackSafe('group_undefined', null);
+		});
+
+	}
+
 
 	function callbackSafe(error, result) {
 		if(typeof parsedArgs.callback == 'function')
