@@ -24,15 +24,7 @@ function DnsClient(dnsDb, rpc, config) {
 			};
 		}
 		else
-			var callback = function(error, complete) {
-				console.log(error, complete);
-
-				//completeCallback;
-			};
-
-		console.log(arguments);
-
-		console.log(self._apiBasePath + apiPath);
+			var callback = completeCallback;
 
 		self._rpc.request(self._dnsServerAddress, self._apiBasePath + apiPath, request.query, typeof apiConfig[functionName].requestOptions == 'object' ? apiConfig[functionName].requestOptions : {}, callback);
 	});
