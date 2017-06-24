@@ -15,7 +15,7 @@ module.exports = function(dnsDb) {
 		});
 	});
 
-	ApiBuilder.toRouter(apiConfig, router); // Add functions specified in apiConfig.json
+	ApiBuilder.toRouter(apiConfig, dnsDb, router); // Add functions specified in apiConfig.json
 
 	return router;
 };
