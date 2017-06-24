@@ -24,13 +24,19 @@ function DnsRpc(config) {
 	self._config.dnsClient = Utils.objectMerge(defaultConfig.dnsClient, self._config.dnsClient);
 
 	// Set up RPC
+	self.connected = false;
 	self.rpc = NodeNetworkRpc(self._config.network);
 	self.network = self.rpc.network;
 	self.router = self.rpc.router;
-	['connect', 'disconnect'].forEach(function(eventType) {
-		self.rpc.on(eventType, function() {
-			self.emit(eventType, Array.prototype.slice.call(arguments));
-		});
+
+	self.rpc.on('connect', function() {
+		self.connected = true;
+		self.emit('connect', Array.prototype.slice.call(arguments));
+	});
+
+	self.rpc.on('disconnect', function() {
+		self.connected = false;
+		self.emit('disconnect', Array.prototype.slice.call(arguments));
 	});
 
 	// Set up DNS
