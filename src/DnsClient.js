@@ -1,47 +1,52 @@
 var Utils = require('./Utils');
+var ApiBuilder = require('agnostic-router-api-builder');
+var apiConfig = require('./apiConfig');
 
-function DnsClient(dnsDb, rpc, dnsServerAddress, config) {
-	this._dnsDb = dnsDb;
-	this._rpc = rpc;
-	this._dnsServerAddress = dnsServerAddress; // TODO what to do if undefined? Make local only?
-	this.config = config;
-	if(typeof this.config.apiPath != 'string')
-		throw new Error('dnsClient_apiPath_undefined');
+function DnsClient(dnsDb, rpc, config) {
+
+	console.log(config);
+
+	var self = this;
+
+	self._dnsDb = dnsDb;
+	self._rpc = rpc;
+	self._dnsServerAddress = config.dnsServer;
+	self._apiBasePath = config.apiPath;
+
+	var remoteApiObject = ApiBuilder.toObject(apiConfig, function(functionName, apiPath, request, completeCallback) {
+		// Intercept subscribe callback to insert into dnsDb
+		if(functionName == 'subscribeToGroup') {
+			var callback = function(error, operationDoc) {
+				if(error)
+					completeCallback(error, null);
+				else
+					self._dnsDb.groupsOplog.applyOp(operationDoc);
+			};
+		}
+		else
+			var callback = function(error, complete) {
+				console.log(error, complete);
+
+				//completeCallback;
+			};
+
+		console.log(arguments);
+
+		console.log(self._apiBasePath + apiPath);
+
+		self._rpc.request(self._dnsServerAddress, self._apiBasePath + apiPath, request.query, typeof apiConfig[functionName].requestOptions == 'object' ? apiConfig[functionName].requestOptions : {}, callback);
+	});
+
+	Utils.objectForEach(remoteApiObject, function(functionConfig, functionName) {
+		self[functionName] = function() {
+			if(typeof self._dnsServerAddress == 'string')
+				remoteApiObject[functionName].apply(remoteApiObject, Array.prototype.slice.call(arguments));
+			else
+				self._dnsDb.apply(remoteApiObject, Array.prototype.slice.call(arguments));
+		};
+	});
 }
 
-
-DnsClient.prototype.joinGroup = function(group, callback) {
-	var self = this;
-	self._rpc.request(self._dnsServerAddress, self._config.apiPath + '/join', {address: self._rpc.address, group: group}, {multipleResponses: false}, callback);
-};
-
-DnsClient.prototype.leaveGroup = function(group, callback) {
-	var self = this;
-	self._rpc.request(self._dnsServerAddress, self._config.apiPath + '/leave', {address: self._rpc.address, group: group}, {multipleResponses: false}, callback);
-};
-
-DnsClient.prototype.leaveAllGroups = function(callback) {
-	var self = this;
-	self._rpc.request(self._dnsServerAddress, self._config.apiPath + '/leaveall', {address: self._rpc.address}, {multipleResponses: false}, callback);
-};
-
-DnsClient.prototype.groupAddresses = function(group, callback) {
-	var self = this;
-	self._rpc.request(self._dnsServerAddress, self._config.apiPath + '/group/find', {group: group}, {multipleResponses: false}, callback);
-};
-
-DnsClient.prototype.groupSubscribe = function(group, callback) {
-	var self = this;
-	self._rpc.request(self._dnsServerAddress, self._config.apiPath + '/group/subscribe', {group: group}, {multipleResponses: true}, function(error, operationDoc) {
-		if(error)
-			callback(error, null);
-		else if(operationDoc.operation == 'subscribe')
-			callback(null, operationDoc.subscriptionId);
-		else
-			self._dnsDb.groupsOplog.applyOp(operationDoc);
-	});
-};
-
-module.exports = function(dnsDb, rpc, dnsServerAddress, config) {
-	return new DnsClient(dnsDb, rpc, dnsServerAddress, config);
+module.exports = function(dnsDb, rpc, config) {
+	return new DnsClient(dnsDb, rpc, config);
 };

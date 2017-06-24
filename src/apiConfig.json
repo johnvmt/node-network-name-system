@@ -1,5 +1,5 @@
 {
-  "joinGroup": {
+  "addToGroup": {
 	"pattern": "/join",
 	"arguments": [
 	  {"name": "address", "source": "query"},
@@ -9,7 +9,7 @@
 	  "multipleResponses": false
 	}
   },
-  "leaveGroup": {
+  "removeFromGroup": {
 	"pattern": "/leave",
 	"arguments": [
 	  {"name": "address", "source": "query"},
@@ -19,8 +19,8 @@
 	  "multipleResponses": false
 	}
   },
-  "leaveAllGroups": {
-	"pattern": "leaveall",
+  "removeFromAllGroups": {
+	"pattern": "/leaveall",
 	"arguments": [
 	  {"name": "address", "source": "query"}
 	],
@@ -38,7 +38,7 @@
 	}
   },
   "subscribeToGroup": {
-	"pattern": "group/subscribe",
+	"pattern": "/group/subscribe",
 	"arguments": [
 	  {"name": "groupQuery", "level": 1,  "types": ["object", "string"], "default": {}},
 	  {"name": "oplogQuery", "level": 1, "type": "object", "default": {}}

@@ -153,6 +153,17 @@ DnsDb.prototype.removeFromAllGroups = function(address, callback) {
 	}
 };
 
+DnsDb.prototype.groupAddresses = function(groupName, callback) {
+	this.groups.findOne({_id: groupName}, function(error, group) {
+		if(error)
+			callback(error, null);
+		else if(group == null)
+			callback(null, []);
+		else
+			callback(null, group.addresses);
+	});
+};
+
 DnsDb.prototype.subscribeToGroup = function() {
 
 	var parsedArgs = Utils.parseArgs(

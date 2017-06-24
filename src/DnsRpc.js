@@ -23,9 +23,6 @@ function DnsRpc(config) {
 	self._config.dnsDb = Utils.objectMerge(defaultConfig.dnsDb, self._config.dnsDb);
 	self._config.dnsClient = Utils.objectMerge(defaultConfig.dnsClient, self._config.dnsClient);
 
-	if(typeof self._config.dnsServer != 'string')
-		throw new Error('dnsServer_undefined');
-
 	// Set up RPC
 	self.rpc = NodeNetworkRpc(self._config.network);
 	self.network = self.rpc.network;
@@ -38,7 +35,7 @@ function DnsRpc(config) {
 
 	// Set up DNS
 	self.dnsDb = DnsDb(self._config.dnsDb);
-	self.dnsClient = DnsClient(self.dnsDb, self.rpc, self._config.dnsServer, self._config.dnsClient);
+	self.dnsClient = DnsClient(self.dnsDb, self.rpc, self._config.dnsClient);
 
 	// Add dnsDb to Router (make dnsDb public on the network)
 	if(typeof self._config.dnsDb.public == 'boolean' && self._config.dnsDb.public) {
