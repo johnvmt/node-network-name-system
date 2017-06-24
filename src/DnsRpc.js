@@ -58,7 +58,7 @@ DnsRpc.prototype.request = function() {
 	var parsedArgs = Utils.parseArgs(
 		arguments,
 		[
-			{name: 'destGroup', level: 1, type: 'string', default: self.config.defaultGroup},
+			{name: 'destGroup', level: 1, type: 'string', default: self._config.defaultGroup},
 			{name: 'path', level: 0, validate: function(arg, allArgs) { return typeof arg == 'string' && arg[0] == '/'; }},
 			{name: 'query', level: 1, type: 'object', default: {}},
 			{name: 'options', level: 2,  type: 'object', default: {}},
