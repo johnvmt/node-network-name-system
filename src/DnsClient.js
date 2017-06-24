@@ -3,9 +3,6 @@ var ApiBuilder = require('agnostic-router-api-builder');
 var apiConfig = require('./apiConfig');
 
 function DnsClient(dnsDb, rpc, config) {
-
-	console.log(config);
-
 	var self = this;
 
 	self._dnsDb = dnsDb;
