@@ -34,6 +34,11 @@ function DnsRpc(config) {
 		self.emit('connect', Array.prototype.slice.call(arguments));
 	});
 
+	self.network.on('address', function(address) {
+		console.log(address);
+		// Add any groups
+	});
+
 	self.rpc.on('disconnect', function() {
 		self.connected = false;
 		self.emit('disconnect', Array.prototype.slice.call(arguments));
