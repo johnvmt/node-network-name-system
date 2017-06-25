@@ -32,6 +32,8 @@ function DnsRpc(config) {
 	self.network.on('address', function(address) {
 		self.address = address;
 
+		self.emit('address', address);
+
 		if(typeof address == 'undefined') { // Disconnected
 			if(typeof self._prevAddress != 'undefined')
 				self.dnsClient.removeFromAllGroups(self._prevAddress);
