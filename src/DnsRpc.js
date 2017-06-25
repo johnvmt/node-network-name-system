@@ -29,28 +29,22 @@ function DnsRpc(config) {
 	self.network = self.rpc.network;
 	self.router = self.rpc.router;
 
-	self.rpc.on('connect', function() {
-		self.connected = true;
-		self.emit('connect', Array.prototype.slice.call(arguments));
-	});
-
 	self.network.on('address', function(address) {
+		self.address = address;
+
 		if(typeof address == 'undefined') { // Disconnected
-			if(typeof self.address != 'undefined')
-				self.dnsClient.removeFromAllGroups(self.address);
+			if(typeof self._prevAddress != 'undefined')
+				self.dnsClient.removeFromAllGroups(self._prevAddress);
+			self.emit('disconnect');
 		}
 		else { // Connected
 			self._config.groups.forEach(function(groupName) {
 				self.dnsClient.addToGroup(address, groupName)
 			});
+			self.emit('connect');
 		}
 
-		self.address = address;
-	});
-
-	self.rpc.on('disconnect', function() {
-		self.connected = false;
-		self.emit('disconnect', Array.prototype.slice.call(arguments));
+		self._prevAddress = address;
 	});
 
 	// Set up DNS
