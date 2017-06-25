@@ -31,7 +31,7 @@ function DnsClient(dnsDb, rpc, config) {
 			if(typeof self._dnsServerAddress == 'string')
 				remoteApiObject[functionName].apply(remoteApiObject, Array.prototype.slice.call(arguments));
 			else
-				self._dnsDb.apply(remoteApiObject, Array.prototype.slice.call(arguments));
+				self._dnsDb[functionName].apply(remoteApiObject, Array.prototype.slice.call(arguments));
 		};
 	});
 }

@@ -35,8 +35,17 @@ function DnsRpc(config) {
 	});
 
 	self.network.on('address', function(address) {
-		console.log(address);
-		// Add any groups
+		if(typeof address == 'undefined') { // Disconnected
+			if(typeof self.address != 'undefined')
+				self.dnsClient.removeFromAllGroups(self.address);
+		}
+		else { // Connected
+			self._config.groups.forEach(function(groupName) {
+				self.dnsClient.addToGroup(address, groupName)
+			});
+		}
+
+		self.address = address;
 	});
 
 	self.rpc.on('disconnect', function() {
