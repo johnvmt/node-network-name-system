@@ -40,9 +40,11 @@ function DnsRpc(config) {
 			self.emit('disconnect');
 		}
 		else { // Connected
-			self._config.groups.forEach(function(groupName) {
-				self.dnsClient.addToGroup(address, groupName)
-			});
+			if(Array.isArray(self._config.groups)) {
+				self._config.groups.forEach(function(groupName) {
+					self.dnsClient.addToGroup(address, groupName)
+				});
+			}
 			self.emit('connect');
 		}
 
@@ -76,53 +78,19 @@ DnsRpc.prototype.request = function() {
 		]
 	);
 
-	var defaultOptions = {
-		groupLookup: true,
-		groupSubscribe: false
-	};
-
-	parsedArgs.options = Utils.objectMerge(defaultOptions, parsedArgs.options);
-
 	if(typeof parsedArgs.destGroup != 'string')
 		callbackSafe('destGroup_undefined', null);
 	else {
-		self._dnsDb.groups.findOne(parsedArgs.destGroup, function(error, groupDoc) {
-			if(error)
-				callbackSafe(error, null);
-			else if(groupDoc != null) { // Group is saved locally
-				if(Array.isArray(groupDoc.addresses) && groupDoc.addresses.length > 0) // group has members
-					self._rpc.request(groupDoc.addresses, parsedArgs.path, parsedArgs.query, parsedArgs.options, parsedArgs.callback);
-			}
-			else if(parsedArgs.options.groupLookup) { // Try retreiving group remotely
-				if(parsedArgs.options.groupSubscribe) {
-					// TODO check if subscription in progress
-					self.groupSubscribe(parsedArgs.destGroup, function(error, subscriptionId) {
-						self._dnsDb.groups.findOne(parsedArgs.destGroup, function(error, groupDoc) {
-							if(error)
-								callbackSafe(error, null);
-							else if(groupDoc == null || (Array.isArray(groupDoc.addresses) && groupDoc.addresses.length == 0))
-								callbackSafe('empty_group', null)
-							else if(Array.isArray(groupDoc.addresses) && groupDoc.addresses.length > 0) { // group has members
-								self._rpc.request(groupDoc.addresses, parsedArgs.path, parsedArgs.query, parsedArgs.options, parsedArgs.callback);
-							}
-						});
-					});
-				}
-				else {
-					self.groupAddresses(parsedArgs.destGroup, function(error, addresses) {
-						if(error)
-							callbackSafe(error, null);
-						else
-							self._rpc.request(addresses, parsedArgs.path, parsedArgs.query, parsedArgs.options, parsedArgs.callback);
-					});
-				}
+		self.dnsClient.groupAddresses(parsedArgs.destGroup, parsedArgs.options, function(error, addresses) {
+			if(error) {
+				if(error == 'group_undefined') {}
+				else
+					callbackSafe(error, null);
 			}
 			else
-				callbackSafe('group_undefined', null);
+				self.rpc.request(addresses, parsedArgs.path, parsedArgs.query, parsedArgs.options, callbackSafe);
 		});
-
 	}
-
 
 	function callbackSafe(error, result) {
 		if(typeof parsedArgs.callback == 'function')

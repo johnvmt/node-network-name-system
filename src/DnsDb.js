@@ -51,6 +51,7 @@ DnsDb.prototype.addToGroup = function(address, groupName, callback) {
 	function updateGroup(callback) {
 		var groupQuery = {_id: groupName};
 		var groupDoc = Utils.objectMerge(groupQuery, {$addToSet: {addresses: address}});
+
 		self.groups.update(groupQuery, groupDoc, {upsert: true}, callback);
 	}
 
@@ -158,14 +159,13 @@ DnsDb.prototype.groupAddresses = function(groupName, callback) {
 		if(error)
 			callback(error, null);
 		else if(group == null)
-			callback(null, []);
+			callback('group_undefined', null);
 		else
 			callback(null, group.addresses);
 	});
 };
 
 DnsDb.prototype.subscribeToGroup = function() {
-
 	var parsedArgs = Utils.parseArgs(
 		arguments,
 		[

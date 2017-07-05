@@ -40,9 +40,12 @@
   "subscribeToGroup": {
 	"pattern": "/group/subscribe",
 	"arguments": [
-	  {"name": "groupQuery", "level": 1,  "types": ["object", "string"], "default": {}},
-	  {"name": "oplogQuery", "level": 1, "type": "object", "default": {}}
-	]
+	  {"name": "groupQuery", "source": "query", "level": 1,  "types": ["object", "string"], "default": {}},
+	  {"name": "oplogQuery", "source": "query", "level": 1, "type": "object", "default": {}}
+	],
+	"requestOptions": {
+	  "multipleResponses": true
+	}
   },
   "unsubscribe": {
 	"pattern": "/group/unsubscribe",

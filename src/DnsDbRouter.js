@@ -7,7 +7,7 @@ module.exports = function(dnsDb) {
 
 	// intercept groupSubscribe to minify results
 	router.use('/group/subscribe', function(request, respond, next) {
-		dnsDb.subscribeToGroup(typeof request.query.group == 'string' ? request.query.group : request.query.query, request.query.oplogQuery, function(error, operationDoc) {
+		dnsDb.subscribeToGroup(typeof request.query.group == 'string' ? request.query.group : request.query.groupQuery, request.query.oplogQuery, function(error, operationDoc) {
 			if(error)
 				respond(error, null);
 			else
