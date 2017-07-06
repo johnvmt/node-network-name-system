@@ -175,6 +175,9 @@ DnsDb.prototype.subscribeToGroup = function() {
 		]
 	);
 
+	if(typeof parsedArgs.groupQuery == 'string')
+		parsedArgs.groupQuery = {_id: parsedArgs.groupQuery};
+
 	this.groupsOplogSubscriptions.findSubscribe(parsedArgs.groupQuery, parsedArgs.oplogQuery, function(error, operationDoc) {
 		if(error)
 			parsedArgs.callback(error, null);
