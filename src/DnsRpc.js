@@ -35,8 +35,9 @@ function DnsRpc(config) {
 		self.emit('address', address);
 
 		if(typeof address == 'undefined') { // Disconnected
-			if(typeof self._prevAddress != 'undefined')
+			if(typeof self._prevAddress != 'undefined' && self.connected)
 				self.dnsClient.removeFromAllGroups(self._prevAddress);
+
 			self.emit('disconnect');
 		}
 		else { // Connected
