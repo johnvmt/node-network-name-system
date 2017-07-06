@@ -35,12 +35,13 @@ function DnsRpc(config) {
 		self.emit('address', address);
 
 		if(typeof address == 'undefined') { // Disconnected
+			self.connected = false;
 			if(typeof self._prevAddress != 'undefined' && self.connected)
 				self.dnsClient.removeFromAllGroups(self._prevAddress);
-
 			self.emit('disconnect');
 		}
 		else { // Connected
+			self.connected = true;
 			if(Array.isArray(self._config.groups)) {
 				self._config.groups.forEach(function(groupName) {
 					self.dnsClient.addToGroup(address, groupName)
