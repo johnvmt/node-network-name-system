@@ -1,7 +1,7 @@
 {
   "name": "node-network-ns-rpc",
   "readme": "RPC over Node Network with NameService enabled",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/johnvmt/node-network-ns-rpc.git"
@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "wolfy87-eventemitter": "5.1.x",
-    "agnostic-router": "0.1.x",
+    "agnostic-router": "0.2.x",
     "agnostic-router-api-builder": "https://github.com/johnvmt/agnostic-router-api-builder.git",
     "mongolocal": "1.2.x",
     "node-network-rpc": "https://github.com/johnvmt/node-network-rpc.git",
